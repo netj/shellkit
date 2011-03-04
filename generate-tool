@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+# ShellKit -- a skeleton generator for tools written mostly in shell scripts
+# Usage: shellkit/generate-tool TOOLNAME
+# 
+# Generates a boilerplate code with given name for the new tool:
+# 1. A Makefile that makes use of BuildKit will be prepared.
+# 2. The facade command, named TOOLNAME will be placed in `shell/`.
+# 3. Whole skeleton is prepared as a well-configured Git repo.
+# 
+# TOOLNAME is the name you will call the newly generated tool,
+# and only alphanumeric characters mixed with '_', '.', '+', '-'
+# are allowed.
+# 
+#
+# Author: Jaeho Shin <netj@sparcs.org>
+# Created: 2011-03-03
+set -eu
+
+# make sure we have shellkit at the right place
+if ! [ -d shellkit ] ; then
+    git clone https://github.com/netj/shellkit.git
+fi
+export PATH="$PWD"/shellkit/vocabularies:"$PATH"
+
+ToolName=${1:-}; shift || { usage "$0"; error; }
+
+# sanitize ToolName: no spaces, punctuation; only alphanumeric, [_.+-]
+if [ -n "${ToolName//[a-zA-Z0-9_.+-]/}" ]; then
+    error "TOOLNAME can only contain alphanumeric characters mixed with '_', '.', '+', '-'"
+fi
+
+# a name that can be used safely as variable names with make, bash, etc.
+upperCaseToolName=`tr a-z_.+- A-Z____ <<<$ToolName`
+case $upperCaseToolName in
+    [0-9]*) upperCaseToolName=_$upperCaseToolName ;;
+esac
+
+# prepare some parameters
+params=`mktemp /tmp/shellkit.XXXXXX`
+trap "rm -f $params" EXIT
+cat >$params <<-PARAMS
+ToolName=$ToolName
+TOOLNAME=$upperCaseToolName
+@ShellKitTimestamp@=`date +%F`
+PARAMS
+
+# 0. we encourage using Git
+if ! [ -d .git ]; then
+    git init
+    cp shellkit/template/gitignore .gitignore
+    git submodule add https://github.com/netj/shellkit.git
+fi
+
+# 1. Makefile
+if ! [ -e Makefile ]; then
+    echo Creating a Makefile that uses BuildKit
+    (
+        cd shellkit/template/build
+        customize ../../.. <$params
+    )
+    git submodule add https://github.com/netj/buildkit.git
+fi
+
+# 2. facade
+if ! [ -d shell ]; then
+    echo Creating a facade command-line interface
+    mkdir shell
+    (
+        cd shellkit/template/facade
+        customize ../../../shell <$params
+    )
+    (
+        cd shell
+        for f in module.*; do
+            mv -f "$f" ."$f"
+        done
+    )
+fi
+
+# 3. wrap-up
+git add .
+git commit -m "$ToolName skeleton prepared with ShellKit"

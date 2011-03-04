@@ -1,0 +1,24 @@
+ShellKit
+========
+A skeleton code generator for tools written mostly in shell scripts.
+
+Usage
+-----
+
+Create a directory for the tool's source code and run `generate-tool`:
+
+    mkdir my-tool-src
+    cd my-tool-src
+    git clone https://github.com/netj/shellkit.git
+    shellkit/generate-tool name_of+my-tool.123
+
+You can now build it with make:
+
+    make
+
+Or, you can enjoy our development environment:
+
+    . Developer.sh
+    m
+    name_of+my-tool.123 subcommand
+

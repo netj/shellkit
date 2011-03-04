@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# error -- Show error message
+#
+# Author: Jaeho Shin <netj@ropas.snu.ac.kr>
+# Created: 2010-07-28
+for msg; do echo "$msg"; done >&2
+false

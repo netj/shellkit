@@ -1,0 +1,5 @@
+ * ToolName-help
+ * ToolName-version
+ * update-tool? with
+   - some extension points in facade
+   - extensible Makefile
