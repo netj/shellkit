@@ -1,0 +1,10 @@
+.sw?
+.*.sw?
+.DS_Store
+
+.build
+
+/.stage
+/ToolName-*.sh
+/ToolName-*.tar.gz
+

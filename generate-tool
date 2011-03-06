@@ -47,7 +47,6 @@ PARAMS
 # 0. we encourage using Git
 if ! [ -d .git ]; then
     git init
-    cp shellkit/template/gitignore .gitignore
     git submodule add https://github.com/netj/shellkit.git
 fi
 
@@ -59,6 +58,7 @@ if ! [ -e Makefile ]; then
         customize ../../.. <$params
     )
     git submodule add https://github.com/netj/buildkit.git
+    mv -i gitignore .gitignore
 fi
 
 # 2. facade

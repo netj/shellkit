@@ -1,7 +1,0 @@
-.sw?
-.*.sw?
-.DS_Store
-
-/.build
-/.stage
-
